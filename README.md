@@ -28,10 +28,8 @@ The Project is developed using **React.js**, **MongoDB**, **Python**, **OpenAI**
 ### Database - MongoDB
 - install mongoDB, if not installed
 - connect mongoDB with the chatbot
-- enjoy 😁
-
 
 #### Note: This Project is under MIT Licence. So, if anyone wants to add features or want to contribute, create a PR for your input and will be then merged if found useful. 
 #### If found some issues in current release, please raise in issue and create a PR for it.
 
-### Thank You Everyone!
+### Thank You Everyone! - enjoy 😁
