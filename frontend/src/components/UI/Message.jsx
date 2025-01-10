@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown';
+
 const Message = ({ sender, text }) => {
     const isUser = sender === 'user';
 
@@ -14,7 +16,17 @@ const Message = ({ sender, text }) => {
             <div className="flex items-center space-x-2">
                 <i className="fas fa-robot text-black" />
                 <div className='max-w-screen-lg px-4 py-2 rounded-lg bg-black text-white'>
+                <ReactMarkdown
+                    components={{
+                        ol: ({ node, ...props }) => (
+                            <ol style={{ listStyleType: "decimal", paddingLeft: "20px" }} {...props} />
+                        ),
+                        ul: ({ node, ...props }) => (
+                            <ul style={{ listStyleType: "disc", paddingLeft: "20px" }} {...props} />
+                        ),
+                    }}>
                     {text}
+                </ReactMarkdown>
                 </div>
             </div>
         )}

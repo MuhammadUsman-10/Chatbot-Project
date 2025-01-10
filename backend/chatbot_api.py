@@ -4,12 +4,15 @@ from mongo_service import save_chat_to_mongodb, fetch_chat_from_mongodb
 from fastapi import FastAPI, HTTPException, Depends, requests
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from chatbot import chain
+from chatbot import chain_with_memory
 from fastapi.security import OAuth2PasswordBearer
 from werkzeug.security import generate_password_hash, check_password_hash
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import List
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationChain
+
 
 
 url = ["http://localhost:8000/ask", "http://localhost:8000/login", "http://localhost:8000/signup", "http://localhost:8000/chats"]
@@ -44,12 +47,20 @@ class Login(BaseModel):
 class Question(BaseModel):
     question: str
 
-class Chat(BaseModel):
-    user_id: str
+class Message(BaseModel):
     role: str
     content: str
-    chat_name: str
     timestamp: str
+
+
+class Chat(BaseModel):
+    user_id: str
+    chat_name: str
+    messages: List[Message]
+
+
+class ResponseModel(BaseModel):
+    data: List[Chat]
 
 app = FastAPI()
 
@@ -59,6 +70,17 @@ app.add_middleware(
     , allow_methods = ["*"]
     , allow_headers = ["*"]
 )
+
+def format_response(response):
+    """
+    Format the response with Markdown-style bullet points.
+    """
+    if "\n" in response:
+        # Split the response into lines and add bullet points
+        lines = response.split("\n")
+        formatted_response = "\n".join(f" {line}" for line in lines)
+        return formatted_response
+    return response
 
 # Decode JWT token and extract user_id
 def get_current_user(token: str):
@@ -87,11 +109,13 @@ def handle_question(input: Question, token: str = Depends(oauth2_scheme)):
             
             # Response generator to stream chunks
             def response_stream():
-                response_generator = chain.stream(input.question)
+                response_generator = chain_with_memory.stream(
+                    {"query": input.question},
+                    config={"configurable": {"session_id": user_id}})
                 response = ""
                 for chunk in response_generator:
                     response += chunk
-                    yield chunk  # Send each chunk to the client
+                    yield format_response(chunk)  # Send each chunk to the client
                 save_chat_to_mongodb(user_id, "assistant", response)  # Save the full response once streaming completes
             
             return StreamingResponse(response_stream(), media_type="text/plain")
@@ -148,29 +172,38 @@ async def login_for_access_token(user: Login):
                 # Add other fields you want to return here
         }
 
-@app.get("/chats", response_model=List[Chat])
+@app.get("/chats", response_model=ResponseModel)
 async def get_chat_history(token: str = Depends(oauth2_scheme)):
     """
     Fetch chat history for a specific user from MongoDB.
-
-    Args:
-        token (str): The authentication token used to fetch the current user.
-
-    Returns:
-        list: List of chat sessions (chat_name, timestamp) for the given user.
     """
     try:
-        # Get the user ID from the token
-        user_id = get_current_user(token)  # Ensure this function works correctly
-        
-        # Fetch chat history from MongoDB for the specific user
-        chats = await chats_collection.find({"user_id": user_id})
+        user_id = get_current_user(token)
+        chats = list(chats_collection.find({"user_id": user_id}).sort("timestamp", 1))
 
         if not chats:
             raise HTTPException(status_code=404, detail="No chats found for this user")
-        
-        # Return the chat history
-        return chats
 
+        # Prepare the chat data
+        chat_history = [
+            {
+                "user_id": chat["user_id"],
+                "chat_name": chat["chat_name"],
+                "messages": [
+                    {
+                        "role": message["role"],
+                        "content": message["content"],
+                        "timestamp": message.get("timestamp", "").isoformat() if "timestamp" in message else None
+                    }
+                    for message in chat.get("messages", [])
+                ],
+            }
+            for chat in chats
+        ]
+
+        return {"data": chat_history}
+
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal Server Error")

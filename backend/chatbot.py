@@ -7,6 +7,9 @@ from tqdm import tqdm
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain.memory import ChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
 load_dotenv()
 
@@ -79,12 +82,31 @@ def format_docs(docs):
 
 LLM = ChatOpenAI(model='gpt-4o-mini', temperature=0.7)
 retriever = retrieve_response()
-prompt = ChatPromptTemplate.from_template(
-    """The following is a conversation with a Mental Health Assistant. The assistant is empathetic, compassionate, and provides supportive responses. It is designed to help users manage stress, emotions, and mental health-related concerns. Keep the conversation good, you can be a bit casual if some user interacts with you casually but not so over ok and be human friendly, can have some hello, hi and goodbyes, etc. If any irrelevant question is asked, say 'I am here to assist with mental health concerns only. You can answer any question from this {data}
-    This is the topic:{query}"""
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "The following is a conversation with a Mental Health Assistant. The assistant is empathetic, compassionate, and provides supportive responses. It is designed to help users manage stress, emotions, and mental health-related concerns. Keep the conversation good, you can be a bit casual if some user interacts with you casually but not so over ok and be human friendly, can have some hello, hi and goodbyes, etc. If any irrelevant question is asked, say 'I am here to assist with mental health concerns only.' You can answer any question from this {data}"),
+    MessagesPlaceholder(variable_name="history"),  # Add history to the prompt
+    ("human", "{query}"),
+])
+# Store chat history for each session
+store = {}
+
+def get_session_history(session_id: str) -> BaseChatMessageHistory:
+    if session_id not in store:
+        store[session_id] = ChatMessageHistory()
+    return store[session_id]
+
+chain = prompt | LLM | StrOutputParser()
+# chain = ({"data": retriever | format_docs, 
+#         "query": RunnablePassthrough()} 
+#         | prompt 
+#         | LLM 
+#         | StrOutputParser())
+
+# Add memory to the chain
+chain_with_memory = RunnableWithMessageHistory(
+    chain,
+    get_session_history,
+    data = "data",
+    input_messages_key="query",
+    history_messages_key="history",
 )
-chain = ({"data": retriever | format_docs, 
-        "query": RunnablePassthrough()} 
-        | prompt 
-        | LLM 
-        | StrOutputParser())

@@ -3,7 +3,7 @@ import ChatInput from '../components/UI/ChatInput';
 import ChatWindow from '../components/UI/ChatWindow';
 import usePersistedUserState from '../components/UI/persistedHook';
 import TypingIndicator from '../components/UI/Typing';
-import Sidebar from '../components/UI/Sidebar';
+// import Sidebar from '../components/UI/Sidebar';
 
 const Chatbot = () => {
     const [messages, setMessages] = useState([]);
@@ -13,18 +13,29 @@ const Chatbot = () => {
 
     // Load messages from localStorage on refresh
     useEffect(() => {
-        const savedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const savedMessages = userInfo.chatMessages || [];
         setMessages(savedMessages);
     }, []);
 
     // Save messages to localStorage whenever they change
     useEffect(() => {
         const saveMessages = () => {
-            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+            userInfo.chatMessages = messages; // Update chatMessages in userInfo
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
         };
         const debounceSave = setTimeout(saveMessages, 300); // Debounce by 300ms
         return () => clearTimeout(debounceSave);
     }, [messages]);
+
+    // useEffect(() => {
+    //     if (messages.length === 0) {
+    //         setMessages([{ text: "Hey! How are you?", fromUser: false },
+    //         { text: "I am here to help you with your feelings and emotions. Feel free to share your thoughts with me.", fromUser: false }
+    //         ]);
+    //     }
+    // }, [messages]);
 
     const handleSend = async (question) => {
         const userMessage = { sender: 'user', text: question };
@@ -57,9 +68,7 @@ const Chatbot = () => {
             while (true) {
                 const { value, done } = await reader.read();
                 if (done) break;
-
                 botMessage += decoder.decode(value, { stream: true });
-
                 // Check if the bot message is not already added
                 if (!isBotMessageAdded) {
                     setMessages((prev) => [...prev, { sender: "bot", text: botMessage }]);
@@ -84,10 +93,9 @@ const Chatbot = () => {
         <div className="bg-gray-100">
             <div className='flex'>
                 {/* <Sidebar /> */}
-                <div className="container mx-auto flex flex-col h-screen">
+                <div className="container mx-auto flex flex-col h-[80vh]">
                     <div className="flex-1 overflow-y-auto p-4">
                         <ChatWindow messages={messages} />
-                        {/* {isTyping && <div className="text-gray-500 italic">Bot is typing...</div>} */}
                         {isTyping && <TypingIndicator />}
                     </div>
                     <div className="p-4 bg-white shadow-md rounded-2xl">
