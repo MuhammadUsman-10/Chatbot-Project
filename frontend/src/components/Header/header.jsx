@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import usePersistedUserState from '../UI/persistedHook';
 import { Link, useNavigate } from 'react-router-dom';
-// import { useDarkMode } from '../Context/DarkModeContext';
+
+const navLinks = [
+    { path: "/chatbot", display: "Chatbot" },
+];
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [user] = usePersistedUserState("userInfo", null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
-    // const [isDarkMode, toggleDarkMode] = useDarkMode();
     const navigate = useNavigate();
 
     const toggleMenu = () => {
@@ -34,7 +36,6 @@ const Header = () => {
     }, [user, isMenuOpen]);
 
     return (
-        // <div className={` ${isDarkMode ? "dark" : ""}`}>
         <div className={`${isMenuOpen ? 'bg-white' : 'bg-[#F8F7F4]'}`}>
             <div className={`container mx-auto flex justify-between items-center p-6 z-50`}>
                 <div className="flex items-center">
@@ -45,17 +46,17 @@ const Header = () => {
                             <i className="fas fa-bars text-2xl"></i> // Bars icon when menu is closed
                         )}
                     </button>
-                    {/* <button onClick={toggleDarkMode} className="lg:hidden mt-3 mr-4">
-                        {isDarkMode ? (
-                            <i className="fas fa-sun text-xl"></i> // Close icon when menu is open
-                        ) : (
-                            <i className="fas fa-moon text-xl"></i> // Bars icon when menu is closed
-                        )}
-                    </button> */}
                     <Link to="/home" className="flex items-center space-x-2">
                         <img src="/icon.webp" alt="logo" className="w-4 h-4" />
                         <p className='text-2xl font-semibold'>Mental health Chatbot</p>
                     </Link>
+                </div>
+                <div className="hidden lg:flex space-x-8">
+                    {navLinks.map((item, index) => (
+                        <Link to={item.path} className="text-base font-semibold text-black hover:text-slate-700" key={index} >
+                        {item.display}
+                        </Link>
+                    ))}
                 </div>
                 {user ? (
                 <div className="flex items-center space-x-4">
@@ -94,6 +95,16 @@ const Header = () => {
             <div className={`lg:hidden fixed top-[113px] left-0 w-full h-auto bg-white shadow-lg z-40 transform ${
                 isMenuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
                 <div className="flex flex-col items-start p-5 space-y-5">
+                    {navLinks.map((item, index) => (
+                        <Link
+                        to={item.path}
+                        className="text-base font-semibold text-black hover:text-slate-700"
+                        key={index}
+                        onClick={toggleMenu}
+                        >
+                        {item.display}
+                        </Link>
+                    ))}
                     {user ? (
                         <div className="hidden">
                             <Link to="/login" className="pr-3 text-base font-semibold">Log in</Link>
@@ -109,7 +120,6 @@ const Header = () => {
                 <div className="lg:hidden inset-0 bg-black opacity-50 z-30" onClick={toggleMenu}></div>
             )}
         </div>
-        // </div>
     );
 };
 

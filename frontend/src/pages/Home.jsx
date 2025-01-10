@@ -7,13 +7,13 @@ const Home = () =>{
                 <div className="inline-block">
                     <p className=" bg-yellow-600 text-black text-base md:text-lg py-2 px-4 rounded-full mb-6 inline-block animate-colorCycle font-serif">Your Virtual therapist!</p>
                 </div>
-                <div className="m-10">
+                {/* <div className="m-10"> */}
                     <h1 className="my-10 mx-auto text-center text-black text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-serif">Your Mental Health Companion, Anytime, Anywhere</h1>
                     <p className="mb-10 text-center text-black text-lg md:text-2xl ">Talk, share, and get support with our AI-powered chatbot designed to guide you through life&apos;s challenges. Release your stress and anxiety with our expertly crafted conversations.</p>
                     <Link to="/chatbot" className="bg-slate-900 text-white font-semibold py-5 px-7 rounded-full shadow-lg hover:bg-slate-700 transition duration-300">
-                        Chat Now
+                        Get Started
                     </Link>
-                </div>
+                {/* </div> */}
             </div>
         </div>
     );

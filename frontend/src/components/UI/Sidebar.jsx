@@ -22,8 +22,8 @@ const Sidebar = () => {
                 //  // Add headers to the request
                 {
                     headers: { Authorization: `Bearer ${token}` }  // Send token in the Authorization header
-                });
-                setChatHistory(response.data.data); // Assuming response.data contains chat history
+                });;
+                setChatHistory(response.data); // Assuming response.data contains chat history
             } catch (error) {
                 console.error('Error fetching chat history:', error);
             } finally {
@@ -49,24 +49,21 @@ const Sidebar = () => {
                 <p className="text-red-500">{error}</p>  // Display error message
             ) : (
                 <ul className="space-y-4">
-                {chatHistory.map((chat) => (
-                    <li
-                        key={chat.chat_name}
-                        onClick={() => handleChatClick(chat.chat_name)}
-                        className="cursor-pointer p-2 rounded hover:bg-gray-700"
-                    >
-                        <div className="flex justify-between items-center">
-                            <span>{chat.chat_name}</span>
-                            <span className="text-sm text-gray-400">
-                                {/* Use the first message timestamp if messages exist */}
-                                {chat.messages?.length > 0
-                                    ? new Date(chat.messages[0].timestamp).toLocaleString()
-                                    : "No messages"}
-                            </span>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+                    {Object.keys(chatHistory).map((chatName) => (
+                        <li
+                            key={chatName}
+                            onClick={() => handleChatClick(chatName)}
+                            className="cursor-pointer p-2 rounded hover:bg-gray-700"
+                        >
+                            <div className="flex justify-between items-center">
+                                <span>{chatName}</span>
+                                <span className="text-sm text-gray-400">
+                                    {new Date(chatHistory[chatName][0].timestamp).toLocaleString()}
+                                </span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             )}
         </div>
     );
