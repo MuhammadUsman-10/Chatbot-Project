@@ -10,11 +10,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import List
+import os
 
 
 url = ["http://localhost:8000/ask", "http://localhost:8000/login", "http://localhost:8000/signup", "http://localhost:8000/chats"]
 # MongoDB connection
-connection_string = "mongodb://localhost:27017"
+connection_string = os.getenv("MONGO_URI")
 client = MongoClient(connection_string)
 db = client["mentalhealth"]
 users_collection = db["users"]
