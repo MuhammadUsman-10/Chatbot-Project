@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
     const [firstname, setFirstname] = useState('');
@@ -77,6 +77,10 @@ const Register = () => {
                         <div className="relative">
                             <button className="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-indigo-500
                             rounded-lg transition duration-200 hover:bg-indigo-600 ease" onClick={onSubmit}>Submit</button>
+                        </div>
+                        <div className="relative">
+                            <Link className="w-full inline-block text-lg" to='/login'
+                            >Already have an account? <span className="underline font-medium">Sign In</span></Link>
                         </div>
                     </div>
                     </div>

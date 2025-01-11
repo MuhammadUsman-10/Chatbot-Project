@@ -1,6 +1,6 @@
 // import { FaGoogle } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import usePersistedUserState from '../components/UI/persistedHook';
 
@@ -145,6 +145,10 @@ const Login = () => {
                         <div className="relative">
                             <button className="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-indigo-500
                             rounded-lg transition duration-200 hover:bg-indigo-600 ease" onClick={onSubmit}>Submit</button>
+                        </div>
+                        <div className="relative">
+                            <Link className="w-full inline-block text-lg" to='/register'
+                            >Don&apos; have an account? <span className="underline font-medium">Sign Up</span></Link>
                         </div>
                     </div>
                     </div>
