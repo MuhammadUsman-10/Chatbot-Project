@@ -13,7 +13,7 @@ const Login = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8000/login',
+        await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`,
             {email,password},
         ).then((response) => {
             console.log(response);
@@ -36,7 +36,7 @@ const Login = () => {
 
     const refreshToken = async () => {
         try {
-            const response = await axios.post('http://localhost:8000/refresh-token', {token});
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/refresh-token`, {token});
             const userInfo = {
                 ...response.data,
                 expiresAt: new Date().getTime() + response.data.expires_in * 1000,

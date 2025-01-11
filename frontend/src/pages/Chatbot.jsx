@@ -46,7 +46,7 @@ const Chatbot = () => {
 
     const fetchChatResponse = async (question) => {
         try {
-            const response = await fetch('http://localhost:8000/ask', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/ask`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
