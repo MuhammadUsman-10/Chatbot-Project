@@ -6,12 +6,13 @@ const Register = () => {
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`,
+        await axios.post(`${backendUrl}/signup`,
             {firstname, lastname, email, password},
         ).then((response) => {
             console.log(response);
