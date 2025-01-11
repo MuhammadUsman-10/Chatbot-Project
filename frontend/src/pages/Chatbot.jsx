@@ -3,6 +3,7 @@ import ChatInput from '../components/UI/ChatInput';
 import ChatWindow from '../components/UI/ChatWindow';
 import usePersistedUserState from '../components/UI/persistedHook';
 import TypingIndicator from '../components/UI/Typing';
+import { process } from "react-native-dotenv";
 
 const Chatbot = () => {
     const [messages, setMessages] = useState([]);
