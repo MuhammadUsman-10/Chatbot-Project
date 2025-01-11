@@ -11,7 +11,7 @@ const Home = () =>{
                     <h1 className="my-10 mx-auto text-center text-black text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-serif">Your Mental Health Companion, Anytime, Anywhere</h1>
                     <p className="mb-10 text-center text-black text-lg md:text-2xl ">Talk, share, and get support with our AI-powered chatbot designed to guide you through life&apos;s challenges. Release your stress and anxiety with our expertly crafted conversations.</p>
                     <Link to="/chatbot" className="bg-slate-900 text-white font-semibold py-5 px-7 rounded-full shadow-lg hover:bg-slate-700 transition duration-300">
-                        Get Started
+                        Chat Now
                     </Link>
                 {/* </div> */}
             </div>

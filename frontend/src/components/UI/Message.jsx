@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+
 const Message = ({ sender, text }) => {
     const isUser = sender === 'user';
 
@@ -14,7 +16,9 @@ const Message = ({ sender, text }) => {
             <div className="flex items-center space-x-2">
                 <i className="fas fa-robot text-black" />
                 <div className='max-w-screen-lg px-4 py-2 rounded-lg bg-black text-white'>
-                    {text}
+                    <ReactMarkdown>
+                        {text}
+                    </ReactMarkdown>
                 </div>
             </div>
         )}

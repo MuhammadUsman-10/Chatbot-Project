@@ -4,7 +4,7 @@ from mongo_service import save_chat_to_mongodb, fetch_chat_from_mongodb
 from fastapi import FastAPI, HTTPException, Depends, requests
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from chatbot import chain
+from chatbot import chain_with_memory
 from fastapi.security import OAuth2PasswordBearer
 from werkzeug.security import generate_password_hash, check_password_hash
 from jose import JWTError, jwt
@@ -23,7 +23,7 @@ chats_collection = db["chats"]
 # JWT Secret Key and Algorithm
 SECRET_KEY = "hdye83*gT$7yh@4G#8!3"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 180
 
 # FastAPI setup
 app = FastAPI()
@@ -60,6 +60,17 @@ app.add_middleware(
     , allow_headers = ["*"]
 )
 
+def format_response(response):
+    """
+    Format the response with Markdown-style bullet points.
+    """
+    if "\n" in response:
+        # Split the response into lines and add bullet points
+        lines = response.split("\n")
+        formatted_response = "\n".join(f" {line}" for line in lines)
+        return formatted_response
+    return response
+
 # Decode JWT token and extract user_id
 def get_current_user(token: str):
     credentials_exception = HTTPException(
@@ -87,11 +98,14 @@ def handle_question(input: Question, token: str = Depends(oauth2_scheme)):
             
             # Response generator to stream chunks
             def response_stream():
-                response_generator = chain.stream(input.question)
+                response_generator = chain_with_memory.stream(
+                    {"query":input.question},
+                    config={"configurable": {"session_id": user_id}}
+                )
                 response = ""
                 for chunk in response_generator:
                     response += chunk
-                    yield chunk  # Send each chunk to the client
+                    yield format_response(chunk)  # Send each chunk to the client
                 save_chat_to_mongodb(user_id, "assistant", response)  # Save the full response once streaming completes
             
             return StreamingResponse(response_stream(), media_type="text/plain")
@@ -144,9 +158,26 @@ async def login_for_access_token(user: Login):
             "token_type": "Bearer", 
             "firstname": db_user["firstname"],
             "lastname": db_user["lastname"],
-            "email": db_user["email"]
-                # Add other fields you want to return here
+            "email": db_user["email"],
+            "expires_in": access_token_expires.total_seconds()  # Expiry time in seconds
         }
+
+@app.post("/refresh-token")
+async def refresh_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            raise HTTPException(status_code=401, detail="Invalid token.")
+
+        # Generate new token
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        new_token = create_access_token(data={"sub": email}, expires_delta=access_token_expires)
+        return {"accessToken": new_token, "expires_in": access_token_expires.total_seconds()}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired.")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token.")
 
 @app.get("/chats", response_model=List[Chat])
 async def get_chat_history(token: str = Depends(oauth2_scheme)):

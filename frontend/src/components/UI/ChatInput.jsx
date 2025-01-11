@@ -24,6 +24,14 @@ const ChatInput = ({ onSend }) => {
         setInputValue(e.target.value);
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();  // Prevent new line on Enter
+            handleSend(inputValue);
+            setInputValue('');
+        }
+    };
+
     const handleSend = () => {
         const messageToSend = inputValue.trim() || transcript.trim();
         if (messageToSend) {
@@ -35,12 +43,14 @@ const ChatInput = ({ onSend }) => {
 
     return (
         <div className="flex items-center space-x-2">
-        <input
+        <textarea
             type="text"
             placeholder="Type a question..."
-            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 overflow-hidden"
             value={inputValue || transcript}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            style={{ resize: "none", height: "50px", lineHeight: "30px" }}
         />
         {isListening ? (
             <button onClick={stoplistening}>

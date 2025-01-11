@@ -7,7 +7,6 @@ const Register = () => {
     const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const onSubmit = async (e) => {
@@ -18,91 +17,130 @@ const Register = () => {
             console.log(response);
             if (response.status === 200) {
                 navigate('/login');
-                setErrorMessage('');
+                alert('Account created successfully');
             }
         }).catch ((error) => {
             console.log(error);
-            setErrorMessage('Invalid email or password');
+            alert('Account creation failed');
         });    
     };
     
     return (
-        <div className="flex w-full h-auto bg-white">
-            <div className="hidden md:inline-block w-1/2 object-cover overflow-hidden">
-                <video playsInline autoPlay muted loop className="w-full h-full"
-                    src="https://cdn.dribbble.com/uploads/48292/original/30fd1f7b63806eff4db0d4276eb1ac45.mp4?1689187515">
-                </video>
-            </div>
-            <div className="w-1/2">
-                <div className="container mx-auto">
-                    <div className="flex items-center justify-center">
-                        <div className="max-w-lg">
-                            <div className='flex items-center justify-center mb-8'>
-                                <h2 className="text-4xl font-bold text-center">SignUp to Mental Health Chatbot</h2>
-                            </div>
-                            <form>
-                                <div className="mb-4">
-                                    <label className="block text-gray-900 text-sm font-bold mb-2" htmlFor="firstname">
-                                        First Name
-                                    </label>
-                                    <input
-                                    className="shadow appearance-none border rounded-xl w-full py-4 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        id="firstname"
-                                        type="firstname"
-                                        placeholder="First Name"
-                                        value={firstname}
-                                        onChange={(e) => setFirstname(e.target.value)}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-gray-900 text-sm font-bold mb-2" htmlFor="lastname">
-                                        Last Name
-                                    </label>
-                                    <input
-                                    className="shadow appearance-none border rounded-xl w-full py-4 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        id="lastname"
-                                        type="lastname"
-                                        placeholder="Last Name"
-                                        value={lastname}
-                                        onChange={(e) => setLastname(e.target.value)}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-gray-900 text-sm font-bold mb-2" htmlFor="email">
-                                        Email
-                                    </label>
-                                    <input
-                                    className="shadow appearance-none border rounded-xl w-full py-4 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        id="email"
-                                        type="email"
-                                        placeholder="Email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                                <div className="mb-6">
-                                    <label className="block text-gray-900 text-sm font-bold mb-2" htmlFor="password">
-                                        Password
-                                    </label>
-                                    <input
-                                        className="shadow appearance-none border rounded-xl w-full py-4 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                                        id="password"
-                                        type="password"
-                                        placeholder="Password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </div>
-                                {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
-                                <div className="flex-col items-center justify-center bg-white text-black py-3 px-4 rounded-full gap-3 mb-4">
-                                    <button className="w-full bg-slate-900 hover:bg-slate-700 text-white py-3 px-4 rounded-full font-bold focus:outline-none focus:shadow-outline"
-                                        onClick={onSubmit} >
-                                        Create Account
-                                    </button>
-                                </div>
-                            </form>
+        <div className="bg-white relative lg:py-1">
+            <div className="flex flex-col items-center justify-between pt-0 pr-10 pb-0 pl-10 mt-0 mr-auto mb-0 ml-auto max-w-7xl
+                xl:px-5 lg:flex-row">
+                <div className="flex flex-col items-center w-full pt-5 pr-10 pb-20 pl-10 lg:pt-20 lg:flex-row">
+                    <div className="w-full bg-cover relative max-w-md lg:max-w-2xl lg:w-7/12">
+                        <div className="flex flex-col items-center justify-center w-full h-full relative lg:pr-10">
+                            <img src="https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg" className="btn-"/>
                         </div>
                     </div>
+                <div className="w-full mt-20 mr-0 mb-0 ml-0 relative z-10 max-w-2xl lg:mt-0 lg:w-5/12">
+                    <div className="flex flex-col items-start justify-start pt-10 pr-10 pb-10 pl-10 bg-white shadow-2xl rounded-xl
+                        relative z-10">
+                        <p className="w-full text-4xl font-medium text-center leading-snug font-serif">Sign up for an account</p>
+                        <div className="w-full mt-6 mr-0 mb-0 ml-0 relative space-y-8">
+                            <div className="relative">
+                                <p className="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600 absolute">First Name</p>
+                                <input placeholder="Muhammad" type="text" value={firstname}
+                                    onChange={(e) => setFirstname(e.target.value)}
+                                    className="border placeholder-gray-400 focus:outline-none
+                                    focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                                    border-gray-300 rounded-md"/>
+                            </div>
+                            <div className="relative">
+                                <p className="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600
+                                    absolute">Last Name</p>
+                                <input placeholder="Usman" type="text" value={lastname}
+                                    onChange={(e) => setLastname(e.target.value)}
+                                    className="border placeholder-gray-400 focus:outline-none
+                                    focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                                    border-gray-300 rounded-md"/>
+                            </div>
+                            <div className="relative">
+                                <p className="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600 absolute">Email</p>
+                                <input placeholder="123@ex.com" type="text" value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="border placeholder-gray-400 focus:outline-none
+                                    focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                                    border-gray-300 rounded-md"/>
+                            </div>
+                            <div className="relative">
+                                <p className="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600
+                                    absolute">Password</p>
+                                <input placeholder="Password" type="password" value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="border placeholder-gray-400 focus:outline-none
+                                    focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                                    border-gray-300 rounded-md"/>
+                            </div>
+                        <div className="relative">
+                            <button className="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-indigo-500
+                            rounded-lg transition duration-200 hover:bg-indigo-600 ease" onClick={onSubmit}>Submit</button>
+                        </div>
+                    </div>
+                    </div>
+                    <svg viewBox="0 0 91 91" className="absolute top-0 left-0 z-0 w-32 h-32 -mt-12 -ml-12 text-yellow-300
+                        fill-current"><g stroke="none" strokeWidth="1" fillRule="evenodd"><g fillRule="nonzero"><g><g><circle
+                        cx="3.261" cy="3.445" r="2.72"/><circle cx="15.296" cy="3.445" r="2.719"/><circle cx="27.333" cy="3.445"
+                        r="2.72"/><circle cx="39.369" cy="3.445" r="2.72"/><circle cx="51.405" cy="3.445" r="2.72"/><circle cx="63.441"
+                        cy="3.445" r="2.72"/><circle cx="75.479" cy="3.445" r="2.72"/><circle cx="87.514" cy="3.445" r="2.719"/></g><g
+                        transform="translate(0 12)"><circle cx="3.261" cy="3.525" r="2.72"/><circle cx="15.296" cy="3.525"
+                        r="2.719"/><circle cx="27.333" cy="3.525" r="2.72"/><circle cx="39.369" cy="3.525" r="2.72"/><circle
+                        cx="51.405" cy="3.525" r="2.72"/><circle cx="63.441" cy="3.525" r="2.72"/><circle cx="75.479" cy="3.525"
+                        r="2.72"/><circle cx="87.514" cy="3.525" r="2.719"/></g><g transform="translate(0 24)"><circle cx="3.261"
+                        cy="3.605" r="2.72"/><circle cx="15.296" cy="3.605" r="2.719"/><circle cx="27.333" cy="3.605" r="2.72"/><circle
+                        cx="39.369" cy="3.605" r="2.72"/><circle cx="51.405" cy="3.605" r="2.72"/><circle cx="63.441" cy="3.605"
+                        r="2.72"/><circle cx="75.479" cy="3.605" r="2.72"/><circle cx="87.514" cy="3.605" r="2.719"/></g><g
+                        transform="translate(0 36)"><circle cx="3.261" cy="3.686" r="2.72"/><circle cx="15.296" cy="3.686"
+                        r="2.719"/><circle cx="27.333" cy="3.686" r="2.72"/><circle cx="39.369" cy="3.686" r="2.72"/><circle
+                        cx="51.405" cy="3.686" r="2.72"/><circle cx="63.441" cy="3.686" r="2.72"/><circle cx="75.479" cy="3.686"
+                        r="2.72"/><circle cx="87.514" cy="3.686" r="2.719"/></g><g transform="translate(0 49)"><circle cx="3.261"
+                        cy="2.767" r="2.72"/><circle cx="15.296" cy="2.767" r="2.719"/><circle cx="27.333" cy="2.767" r="2.72"/><circle
+                        cx="39.369" cy="2.767" r="2.72"/><circle cx="51.405" cy="2.767" r="2.72"/><circle cx="63.441" cy="2.767"
+                        r="2.72"/><circle cx="75.479" cy="2.767" r="2.72"/><circle cx="87.514" cy="2.767" r="2.719"/></g><g
+                        transform="translate(0 61)"><circle cx="3.261" cy="2.846" r="2.72"/><circle cx="15.296" cy="2.846"
+                        r="2.719"/><circle cx="27.333" cy="2.846" r="2.72"/><circle cx="39.369" cy="2.846" r="2.72"/><circle
+                        cx="51.405" cy="2.846" r="2.72"/><circle cx="63.441" cy="2.846" r="2.72"/><circle cx="75.479" cy="2.846"
+                        r="2.72"/><circle cx="87.514" cy="2.846" r="2.719"/></g><g transform="translate(0 73)"><circle cx="3.261"
+                        cy="2.926" r="2.72"/><circle cx="15.296" cy="2.926" r="2.719"/><circle cx="27.333" cy="2.926" r="2.72"/><circle
+                        cx="39.369" cy="2.926" r="2.72"/><circle cx="51.405" cy="2.926" r="2.72"/><circle cx="63.441" cy="2.926"
+                        r="2.72"/><circle cx="75.479" cy="2.926" r="2.72"/><circle cx="87.514" cy="2.926" r="2.719"/></g><g
+                        transform="translate(0 85)"><circle cx="3.261" cy="3.006" r="2.72"/><circle cx="15.296" cy="3.006"
+                        r="2.719"/><circle cx="27.333" cy="3.006" r="2.72"/><circle cx="39.369" cy="3.006" r="2.72"/><circle
+                        cx="51.405" cy="3.006" r="2.72"/><circle cx="63.441" cy="3.006" r="2.72"/><circle cx="75.479" cy="3.006"
+                        r="2.72"/><circle cx="87.514" cy="3.006" r="2.719"/></g></g></g></g></svg>
+                    <svg viewBox="0 0 91 91" className="absolute bottom-0 right-0 z-0 w-32 h-32 -mb-12 -mr-12 text-indigo-500
+                        fill-current"><g stroke="none" strokeWidth="1" fillRule="evenodd"><g fillRule="nonzero"><g><g><circle
+                        cx="3.261" cy="3.445" r="2.72"/><circle cx="15.296" cy="3.445" r="2.719"/><circle cx="27.333" cy="3.445"
+                        r="2.72"/><circle cx="39.369" cy="3.445" r="2.72"/><circle cx="51.405" cy="3.445" r="2.72"/><circle cx="63.441"
+                        cy="3.445" r="2.72"/><circle cx="75.479" cy="3.445" r="2.72"/><circle cx="87.514" cy="3.445" r="2.719"/></g><g
+                        transform="translate(0 12)"><circle cx="3.261" cy="3.525" r="2.72"/><circle cx="15.296" cy="3.525"
+                        r="2.719"/><circle cx="27.333" cy="3.525" r="2.72"/><circle cx="39.369" cy="3.525" r="2.72"/><circle
+                        cx="51.405" cy="3.525" r="2.72"/><circle cx="63.441" cy="3.525" r="2.72"/><circle cx="75.479" cy="3.525"
+                        r="2.72"/><circle cx="87.514" cy="3.525" r="2.719"/></g><g transform="translate(0 24)"><circle cx="3.261"
+                        cy="3.605" r="2.72"/><circle cx="15.296" cy="3.605" r="2.719"/><circle cx="27.333" cy="3.605" r="2.72"/><circle
+                        cx="39.369" cy="3.605" r="2.72"/><circle cx="51.405" cy="3.605" r="2.72"/><circle cx="63.441" cy="3.605"
+                        r="2.72"/><circle cx="75.479" cy="3.605" r="2.72"/><circle cx="87.514" cy="3.605" r="2.719"/></g><g
+                        transform="translate(0 36)"><circle cx="3.261" cy="3.686" r="2.72"/><circle cx="15.296" cy="3.686"
+                        r="2.719"/><circle cx="27.333" cy="3.686" r="2.72"/><circle cx="39.369" cy="3.686" r="2.72"/><circle
+                        cx="51.405" cy="3.686" r="2.72"/><circle cx="63.441" cy="3.686" r="2.72"/><circle cx="75.479" cy="3.686"
+                        r="2.72"/><circle cx="87.514" cy="3.686" r="2.719"/></g><g transform="translate(0 49)"><circle cx="3.261"
+                        cy="2.767" r="2.72"/><circle cx="15.296" cy="2.767" r="2.719"/><circle cx="27.333" cy="2.767" r="2.72"/><circle
+                        cx="39.369" cy="2.767" r="2.72"/><circle cx="51.405" cy="2.767" r="2.72"/><circle cx="63.441" cy="2.767"
+                        r="2.72"/><circle cx="75.479" cy="2.767" r="2.72"/><circle cx="87.514" cy="2.767" r="2.719"/></g><g
+                        transform="translate(0 61)"><circle cx="3.261" cy="2.846" r="2.72"/><circle cx="15.296" cy="2.846"
+                        r="2.719"/><circle cx="27.333" cy="2.846" r="2.72"/><circle cx="39.369" cy="2.846" r="2.72"/><circle
+                        cx="51.405" cy="2.846" r="2.72"/><circle cx="63.441" cy="2.846" r="2.72"/><circle cx="75.479" cy="2.846"
+                        r="2.72"/><circle cx="87.514" cy="2.846" r="2.719"/></g><g transform="translate(0 73)"><circle cx="3.261"
+                        cy="2.926" r="2.72"/><circle cx="15.296" cy="2.926" r="2.719"/><circle cx="27.333" cy="2.926" r="2.72"/><circle
+                        cx="39.369" cy="2.926" r="2.72"/><circle cx="51.405" cy="2.926" r="2.72"/><circle cx="63.441" cy="2.926"
+                        r="2.72"/><circle cx="75.479" cy="2.926" r="2.72"/><circle cx="87.514" cy="2.926" r="2.719"/></g><g
+                        transform="translate(0 85)"><circle cx="3.261" cy="3.006" r="2.72"/><circle cx="15.296" cy="3.006"
+                        r="2.719"/><circle cx="27.333" cy="3.006" r="2.72"/><circle cx="39.369" cy="3.006" r="2.72"/><circle
+                        cx="51.405" cy="3.006" r="2.72"/><circle cx="63.441" cy="3.006" r="2.72"/><circle cx="75.479" cy="3.006"
+                        r="2.72"/><circle cx="87.514" cy="3.006" r="2.719"/></g></g></g></g></svg>
+                </div>
                 </div>
             </div>
         </div>

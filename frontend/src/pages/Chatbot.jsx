@@ -3,7 +3,6 @@ import ChatInput from '../components/UI/ChatInput';
 import ChatWindow from '../components/UI/ChatWindow';
 import usePersistedUserState from '../components/UI/persistedHook';
 import TypingIndicator from '../components/UI/Typing';
-import Sidebar from '../components/UI/Sidebar';
 
 const Chatbot = () => {
     const [messages, setMessages] = useState([]);
@@ -11,16 +10,26 @@ const Chatbot = () => {
     const [user] = usePersistedUserState("userInfo", null);
     const token = user?.accessToken;
 
-    // Load messages from localStorage on refresh
     useEffect(() => {
-        const savedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+        if (messages.length === 0) {
+            setMessages([{ text: "Hi! How are you?", fromUser: false },
+                { text: "How's you feeling today? Share your thoughts or emotions!", fromUser: false },
+            ]);
+        }
+    }, [messages]);
+
+    useEffect(() => {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+        const savedMessages = userInfo.chatMessages || [];
         setMessages(savedMessages);
     }, []);
 
-    // Save messages to localStorage whenever they change
+    // Save messages to userInfo whenever they change
     useEffect(() => {
         const saveMessages = () => {
-            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+            userInfo.chatMessages = messages; // Update chatMessages in userInfo
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
         };
         const debounceSave = setTimeout(saveMessages, 300); // Debounce by 300ms
         return () => clearTimeout(debounceSave);
@@ -83,7 +92,6 @@ const Chatbot = () => {
     return (
         <div className="bg-gray-100">
             <div className='flex'>
-                {/* <Sidebar /> */}
                 <div className="container mx-auto flex flex-col h-screen">
                     <div className="flex-1 overflow-y-auto p-4">
                         <ChatWindow messages={messages} />

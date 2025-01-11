@@ -51,13 +51,6 @@ const Header = () => {
                         <p className='text-2xl font-semibold'>Mental health Chatbot</p>
                     </Link>
                 </div>
-                <div className="hidden lg:flex space-x-8">
-                    {navLinks.map((item, index) => (
-                        <Link to={item.path} className="text-base font-semibold text-black hover:text-slate-700" key={index} >
-                        {item.display}
-                        </Link>
-                    ))}
-                </div>
                 {user ? (
                 <div className="flex items-center space-x-4">
                     <div className="relative flex px-3 py-2 rounded-lg border items-center">

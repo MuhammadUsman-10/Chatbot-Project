@@ -1,12 +1,14 @@
 // import { FaGoogle } from 'react-icons/fa';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import usePersistedUserState from '../components/UI/persistedHook';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [user] = usePersistedUserState("userInfo", null);
+    const token = user?.accessToken;
     const navigate = useNavigate();
 
     const onSubmit = async (e) => {
@@ -15,79 +17,198 @@ const Login = () => {
             {email,password},
         ).then((response) => {
             console.log(response);
-            localStorage.setItem('userInfo', JSON.stringify(response.data));
+            const userInfo = {
+                ...response.data,
+                expiresAt: new Date().getTime() + response.data.expires_in * 1000};
+            localStorage.setItem('userInfo', JSON.stringify(userInfo))
+            // Set a timer to auto logout or refresh token
+            setAutoLogoutTimer(userInfo.expiresAt);
             if (response.status === 200) {
-                navigate('/home');
-                setErrorMessage('');
+                navigate('/chatbot');
+                alert('Login successful');
                 window.location.reload();
             }
         }).catch ((error) => {
             console.log(error);
-            setErrorMessage('Invalid email or password');
+            alert('Invalid email or password');
         });    
+    };
+
+    const refreshToken = async () => {
+        try {
+            const response = await axios.post('http://localhost:8000/refresh-token', {token});
+            const userInfo = {
+                ...response.data,
+                expiresAt: new Date().getTime() + response.data.expires_in * 1000,
+            };
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            setAutoLogoutTimer(userInfo.expiresAt); // Reset the timer
+        } catch (error) {
+            console.log(error);
+            handleLogout(); // Logout if token refresh fails
+        }
+    };
+
+    useEffect(() => {
+        if (user && user.expiresAt) {
+            const currentTime = new Date().getTime();
+            if (currentTime > user.expiresAt) {
+                handleLogout(); // Logout if token is expired
+            } else {
+                setAutoLogoutTimer(user.expiresAt); // Set timer for auto logout
+            }
+        }
+    }, []);
+
+    const setAutoLogoutTimer = (expiresAt) => {
+        const currentTime = new Date().getTime();
+        const timeLeft = expiresAt - currentTime;
+    
+        if (timeLeft > 0) {
+            // Refresh token 5 minutes before expiry
+            const refreshTime = timeLeft - 5 * 60 * 1000; // 5 minutes before expiry
+            if (refreshTime > 0) {
+                setTimeout(() => {
+                    refreshToken(); // Call refresh token function
+                }, refreshTime);
+            }
+    
+            // Auto logout when token expires
+            setTimeout(() => {
+                handleLogout();
+            }, timeLeft);
+        }
+    };
+
+    useEffect(() => {
+        const handleUserActivity = () => {
+            if (user && user.expiresAt) {
+                const currentTime = new Date().getTime();
+                const timeLeft = user.expiresAt - currentTime;
+    
+                // Refresh token if less than 5 minutes are left
+                if (timeLeft > 0 && timeLeft < 5 * 60 * 1000) {
+                    refreshToken();
+                }
+            }
+        };
+    
+        // Add event listeners for user activity
+        window.addEventListener('mousemove', handleUserActivity);
+        window.addEventListener('keypress', handleUserActivity);
+    
+        // Cleanup event listeners
+        return () => {
+            window.removeEventListener('mousemove', handleUserActivity);
+            window.removeEventListener('keypress', handleUserActivity);
+        };
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("userInfo");
+        navigate('/login');
+        window.location.reload();
     };
     
     return (
-        <div className="flex w-full h-auto items-center justify-center bg-white">
-            <div className="hidden md:inline-block w-1/2 object-cover overflow-hidden">
-                <video playsInline autoPlay muted loop className="w-full h-full" 
-                src="https://cdn.dribbble.com/uploads/48226/original/b8bd4e4273cceae2889d9d259b04f732.mp4?1689028949"/>
-            </div>
-            <div className="lg:w-1/2" >
-                <div className="container mx-auto">
-                    <div className="flex items-center justify-center">
-                        <div className="max-w-lg">
-                            <h2 className="text-4xl font-bold mb-8 text-center">Sign in to Mental Health Chatbot</h2>
-                            <form>
-                                <div className="mb-4">
-                                    <label className="block text-gray-900 text-sm font-bold mb-2" htmlFor="email">
-                                        Email
-                                    </label>
-                                    <input
-                                        className="shadow appearance-none border rounded-xl w-full py-4 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        id="email"
-                                        type="text"
-                                        aria-required="true"
-                                        value={email}
-                                        placeholder="Email"
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                                <div className="mb-6">
-                                    <div className="flex justify-between">
-                                    <label className="block text-gray-900 text-sm font-bold mb-2" htmlFor="password">
-                                        Password
-                                    </label>
-                                    <a
-                                        className="inline-block align-baseline underline text-sm text-slate-700"
-                                        href="#"
-                                        title="Click here to reset your password"
-                                    >
-                                        Forgot?
-                                    </a></div>
-                                    <input
-                                        className="shadow appearance-none border rounded-xl w-full py-4 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                                        id="password"
-                                        type="password"
-                                        aria-required="true"
-                                        value={password}
-                                        placeholder="Password"
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </div>
-                                {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
-                                <div className="flex-col items-center justify-center bg-white text-black py-3 px-4 rounded-full gap-3 mb-4">
-                                    <button className="w-full bg-slate-900 hover:bg-slate-700 text-white py-3 px-4 rounded-full font-bold focus:outline-none focus:shadow-outline"
-                                    onClick={onSubmit}>
-                                        Sign In
-                                    </button>
-                                </div>
-                                <div className="text-center text-slate-500 text-sm">
-                                    Don&apos;t have an account? <a href="/register" className="text-slate-900">Sign up</a>   
-                                </div>
-                            </form>
+        <div className="bg-white relative lg:py-1">
+            <div className="flex flex-col items-center justify-between pt-0 pr-10 pb-0 pl-10 mt-0 mr-auto mb-0 ml-auto max-w-7xl
+                xl:px-5 lg:flex-row">
+                <div className="flex flex-col items-center w-full pt-5 pr-10 pb-20 pl-10 lg:pt-20 lg:flex-row">
+                    <div className="w-full bg-cover relative max-w-md lg:max-w-2xl lg:w-7/12">
+                        <div className="flex flex-col items-center justify-center w-full h-full relative lg:pr-10">
+                            <img src="https://res.cloudinary.com/macxenon/image/upload/v1631570592/Run_-_Health_qcghbu.png" className="btn-"/>
                         </div>
                     </div>
+                <div className="w-full mt-20 mr-0 mb-0 ml-0 relative z-10 max-w-2xl lg:mt-0 lg:w-5/12">
+                    <div className="flex flex-col items-start justify-start pt-10 pr-10 pb-10 pl-10 bg-white shadow-2xl rounded-xl
+                        relative z-10">
+                        <p className="w-full text-4xl font-medium text-center leading-snug font-serif">Sign In to Your account</p>
+                        <div className="w-full mt-6 mr-0 mb-0 ml-0 relative space-y-8">
+                            <div className="relative">
+                                <p className="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600 absolute">Email</p>
+                                <input placeholder="123@ex.com" type="text" value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="border placeholder-gray-400 focus:outline-none
+                                    focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                                    border-gray-300 rounded-md"/>
+                            </div>
+                            <div className="relative">
+                                <p className="bg-white pt-0 pr-2 pb-0 pl-2 -mt-3 mr-0 mb-0 ml-2 font-medium text-gray-600
+                                    absolute">Password</p>
+                                <input placeholder="Password" type="password" value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="border placeholder-gray-400 focus:outline-none
+                                    focus:border-black w-full pt-4 pr-4 pb-4 pl-4 mt-2 mr-0 mb-0 ml-0 text-base block bg-white
+                                    border-gray-300 rounded-md"/>
+                            </div>
+                        <div className="relative">
+                            <button className="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-indigo-500
+                            rounded-lg transition duration-200 hover:bg-indigo-600 ease" onClick={onSubmit}>Submit</button>
+                        </div>
+                    </div>
+                    </div>
+                    <svg viewBox="0 0 91 91" className="absolute top-0 left-0 z-0 w-32 h-32 -mt-12 -ml-12 text-yellow-300
+                        fill-current"><g stroke="none" strokeWidth="1" fillRule="evenodd"><g fillRule="nonzero"><g><g><circle
+                        cx="3.261" cy="3.445" r="2.72"/><circle cx="15.296" cy="3.445" r="2.719"/><circle cx="27.333" cy="3.445"
+                        r="2.72"/><circle cx="39.369" cy="3.445" r="2.72"/><circle cx="51.405" cy="3.445" r="2.72"/><circle cx="63.441"
+                        cy="3.445" r="2.72"/><circle cx="75.479" cy="3.445" r="2.72"/><circle cx="87.514" cy="3.445" r="2.719"/></g><g
+                        transform="translate(0 12)"><circle cx="3.261" cy="3.525" r="2.72"/><circle cx="15.296" cy="3.525"
+                        r="2.719"/><circle cx="27.333" cy="3.525" r="2.72"/><circle cx="39.369" cy="3.525" r="2.72"/><circle
+                        cx="51.405" cy="3.525" r="2.72"/><circle cx="63.441" cy="3.525" r="2.72"/><circle cx="75.479" cy="3.525"
+                        r="2.72"/><circle cx="87.514" cy="3.525" r="2.719"/></g><g transform="translate(0 24)"><circle cx="3.261"
+                        cy="3.605" r="2.72"/><circle cx="15.296" cy="3.605" r="2.719"/><circle cx="27.333" cy="3.605" r="2.72"/><circle
+                        cx="39.369" cy="3.605" r="2.72"/><circle cx="51.405" cy="3.605" r="2.72"/><circle cx="63.441" cy="3.605"
+                        r="2.72"/><circle cx="75.479" cy="3.605" r="2.72"/><circle cx="87.514" cy="3.605" r="2.719"/></g><g
+                        transform="translate(0 36)"><circle cx="3.261" cy="3.686" r="2.72"/><circle cx="15.296" cy="3.686"
+                        r="2.719"/><circle cx="27.333" cy="3.686" r="2.72"/><circle cx="39.369" cy="3.686" r="2.72"/><circle
+                        cx="51.405" cy="3.686" r="2.72"/><circle cx="63.441" cy="3.686" r="2.72"/><circle cx="75.479" cy="3.686"
+                        r="2.72"/><circle cx="87.514" cy="3.686" r="2.719"/></g><g transform="translate(0 49)"><circle cx="3.261"
+                        cy="2.767" r="2.72"/><circle cx="15.296" cy="2.767" r="2.719"/><circle cx="27.333" cy="2.767" r="2.72"/><circle
+                        cx="39.369" cy="2.767" r="2.72"/><circle cx="51.405" cy="2.767" r="2.72"/><circle cx="63.441" cy="2.767"
+                        r="2.72"/><circle cx="75.479" cy="2.767" r="2.72"/><circle cx="87.514" cy="2.767" r="2.719"/></g><g
+                        transform="translate(0 61)"><circle cx="3.261" cy="2.846" r="2.72"/><circle cx="15.296" cy="2.846"
+                        r="2.719"/><circle cx="27.333" cy="2.846" r="2.72"/><circle cx="39.369" cy="2.846" r="2.72"/><circle
+                        cx="51.405" cy="2.846" r="2.72"/><circle cx="63.441" cy="2.846" r="2.72"/><circle cx="75.479" cy="2.846"
+                        r="2.72"/><circle cx="87.514" cy="2.846" r="2.719"/></g><g transform="translate(0 73)"><circle cx="3.261"
+                        cy="2.926" r="2.72"/><circle cx="15.296" cy="2.926" r="2.719"/><circle cx="27.333" cy="2.926" r="2.72"/><circle
+                        cx="39.369" cy="2.926" r="2.72"/><circle cx="51.405" cy="2.926" r="2.72"/><circle cx="63.441" cy="2.926"
+                        r="2.72"/><circle cx="75.479" cy="2.926" r="2.72"/><circle cx="87.514" cy="2.926" r="2.719"/></g><g
+                        transform="translate(0 85)"><circle cx="3.261" cy="3.006" r="2.72"/><circle cx="15.296" cy="3.006"
+                        r="2.719"/><circle cx="27.333" cy="3.006" r="2.72"/><circle cx="39.369" cy="3.006" r="2.72"/><circle
+                        cx="51.405" cy="3.006" r="2.72"/><circle cx="63.441" cy="3.006" r="2.72"/><circle cx="75.479" cy="3.006"
+                        r="2.72"/><circle cx="87.514" cy="3.006" r="2.719"/></g></g></g></g></svg>
+                    <svg viewBox="0 0 91 91" className="absolute bottom-0 right-0 z-0 w-32 h-32 -mb-12 -mr-12 text-indigo-500
+                        fill-current"><g stroke="none" strokeWidth="1" fillRule="evenodd"><g fillRule="nonzero"><g><g><circle
+                        cx="3.261" cy="3.445" r="2.72"/><circle cx="15.296" cy="3.445" r="2.719"/><circle cx="27.333" cy="3.445"
+                        r="2.72"/><circle cx="39.369" cy="3.445" r="2.72"/><circle cx="51.405" cy="3.445" r="2.72"/><circle cx="63.441"
+                        cy="3.445" r="2.72"/><circle cx="75.479" cy="3.445" r="2.72"/><circle cx="87.514" cy="3.445" r="2.719"/></g><g
+                        transform="translate(0 12)"><circle cx="3.261" cy="3.525" r="2.72"/><circle cx="15.296" cy="3.525"
+                        r="2.719"/><circle cx="27.333" cy="3.525" r="2.72"/><circle cx="39.369" cy="3.525" r="2.72"/><circle
+                        cx="51.405" cy="3.525" r="2.72"/><circle cx="63.441" cy="3.525" r="2.72"/><circle cx="75.479" cy="3.525"
+                        r="2.72"/><circle cx="87.514" cy="3.525" r="2.719"/></g><g transform="translate(0 24)"><circle cx="3.261"
+                        cy="3.605" r="2.72"/><circle cx="15.296" cy="3.605" r="2.719"/><circle cx="27.333" cy="3.605" r="2.72"/><circle
+                        cx="39.369" cy="3.605" r="2.72"/><circle cx="51.405" cy="3.605" r="2.72"/><circle cx="63.441" cy="3.605"
+                        r="2.72"/><circle cx="75.479" cy="3.605" r="2.72"/><circle cx="87.514" cy="3.605" r="2.719"/></g><g
+                        transform="translate(0 36)"><circle cx="3.261" cy="3.686" r="2.72"/><circle cx="15.296" cy="3.686"
+                        r="2.719"/><circle cx="27.333" cy="3.686" r="2.72"/><circle cx="39.369" cy="3.686" r="2.72"/><circle
+                        cx="51.405" cy="3.686" r="2.72"/><circle cx="63.441" cy="3.686" r="2.72"/><circle cx="75.479" cy="3.686"
+                        r="2.72"/><circle cx="87.514" cy="3.686" r="2.719"/></g><g transform="translate(0 49)"><circle cx="3.261"
+                        cy="2.767" r="2.72"/><circle cx="15.296" cy="2.767" r="2.719"/><circle cx="27.333" cy="2.767" r="2.72"/><circle
+                        cx="39.369" cy="2.767" r="2.72"/><circle cx="51.405" cy="2.767" r="2.72"/><circle cx="63.441" cy="2.767"
+                        r="2.72"/><circle cx="75.479" cy="2.767" r="2.72"/><circle cx="87.514" cy="2.767" r="2.719"/></g><g
+                        transform="translate(0 61)"><circle cx="3.261" cy="2.846" r="2.72"/><circle cx="15.296" cy="2.846"
+                        r="2.719"/><circle cx="27.333" cy="2.846" r="2.72"/><circle cx="39.369" cy="2.846" r="2.72"/><circle
+                        cx="51.405" cy="2.846" r="2.72"/><circle cx="63.441" cy="2.846" r="2.72"/><circle cx="75.479" cy="2.846"
+                        r="2.72"/><circle cx="87.514" cy="2.846" r="2.719"/></g><g transform="translate(0 73)"><circle cx="3.261"
+                        cy="2.926" r="2.72"/><circle cx="15.296" cy="2.926" r="2.719"/><circle cx="27.333" cy="2.926" r="2.72"/><circle
+                        cx="39.369" cy="2.926" r="2.72"/><circle cx="51.405" cy="2.926" r="2.72"/><circle cx="63.441" cy="2.926"
+                        r="2.72"/><circle cx="75.479" cy="2.926" r="2.72"/><circle cx="87.514" cy="2.926" r="2.719"/></g><g
+                        transform="translate(0 85)"><circle cx="3.261" cy="3.006" r="2.72"/><circle cx="15.296" cy="3.006"
+                        r="2.719"/><circle cx="27.333" cy="3.006" r="2.72"/><circle cx="39.369" cy="3.006" r="2.72"/><circle
+                        cx="51.405" cy="3.006" r="2.72"/><circle cx="63.441" cy="3.006" r="2.72"/><circle cx="75.479" cy="3.006"
+                        r="2.72"/><circle cx="87.514" cy="3.006" r="2.719"/></g></g></g></g></svg>
+                </div>
                 </div>
             </div>
         </div>
