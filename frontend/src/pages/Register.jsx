@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useState } from "react";
-import { process } from "react-native-dotenv";
 import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
