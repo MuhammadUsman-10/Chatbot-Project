@@ -2,9 +2,10 @@
 
 from pymongo import MongoClient, ASCENDING
 from datetime import datetime, timedelta
+import os
 
 # MongoDB connection string
-connection_string = "mongodb://localhost:27017"
+connection_string = os.getenv("MONGO_URI")
 
 chat_name =  f"Chat-{datetime.now().isoformat()}"
 

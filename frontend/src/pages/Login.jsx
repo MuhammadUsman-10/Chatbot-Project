@@ -6,13 +6,14 @@ import usePersistedUserState from '../components/UI/persistedHook';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const BASE_URL = process.env.REACT_APP_BACKEND_URL
     const [user] = usePersistedUserState("userInfo", null);
     const token = user?.accessToken;
     const navigate = useNavigate();
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8000/login',
+        await axios.post(`${BASE_URL}/login`,
             {email,password},
         ).then((response) => {
             console.log(response);
@@ -35,7 +36,7 @@ const Login = () => {
 
     const refreshToken = async () => {
         try {
-            const response = await axios.post('http://localhost:8000/refresh-token', {token});
+            const response = await axios.post(`${BASE_URL}/refresh-token`, {token});
             const userInfo = {
                 ...response.data,
                 expiresAt: new Date().getTime() + response.data.expires_in * 1000,
