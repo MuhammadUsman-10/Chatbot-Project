@@ -90,15 +90,15 @@ const Chatbot = () => {
     };
 
     return (
-        <div className="bg-gray-100">
+        <div className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100">
             <div className='flex'>
-                <div className="container mx-auto flex flex-col h-screen">
+                <div className="container mx-auto flex flex-col h-[81vh]">
                     <div className="flex-1 overflow-y-auto p-4">
                         <ChatWindow messages={messages} />
                         {/* {isTyping && <div className="text-gray-500 italic">Bot is typing...</div>} */}
                         {isTyping && <TypingIndicator />}
                     </div>
-                    <div className="p-4 bg-white shadow-md rounded-2xl">
+                    <div className="p-4 bg-gray-200 shadow-md rounded-2xl">
                         <ChatInput onSend={handleSend} />
                     </div>
                 </div>

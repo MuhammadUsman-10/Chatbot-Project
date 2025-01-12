@@ -22,7 +22,11 @@ const Register = () => {
             }
         }).catch ((error) => {
             console.log(error);
-            alert('Account creation failed');
+            if (error.response.status === 400) {
+                alert('User already exists');
+            } else {
+                alert('Account creation failed');
+            }
         });    
     };
     

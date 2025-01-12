@@ -46,7 +46,7 @@ const ChatInput = ({ onSend }) => {
         <textarea
             type="text"
             placeholder="Type a question..."
-            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 overflow-hidden"
+            className="flex-1 px-4 py-2 bg-gray-100 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 overflow-hidden"
             value={inputValue || transcript}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}

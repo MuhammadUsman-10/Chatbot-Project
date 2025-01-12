@@ -3,7 +3,7 @@ import usePersistedUserState from "../components/UI/persistedHook";
 const UserProfile = () => {
     const [user] = usePersistedUserState("userInfo", null);
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="h-[80vh] bg-gray-100 flex items-center justify-center">
             <div className="container mx-auto">
                 <div className="bg-white shadow-lg rounded-lg p-8 w-full">
                     <div className="flex items-center justify-center">

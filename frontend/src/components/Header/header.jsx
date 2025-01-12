@@ -15,7 +15,7 @@ const Header = () => {
     };
 
     return (
-        <div className='bg-[#F8F7F4]'>
+        <div className='bg-gray-100'>
             <div className={`container mx-auto flex justify-between items-center p-6 z-50`}>
                 <div className="flex items-center">
                     <Link to="/home" className="flex items-center space-x-2">
@@ -24,17 +24,17 @@ const Header = () => {
                     </Link>
                 </div>
                 {user ? (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center sm:space-x-4">
                     <div className="relative flex px-3 py-2 rounded-lg border items-center">
-                        <span className="cursor-pointer" onClick={toggleDropdown} >
-                        Hi, {user.firstname}
+                        <span className="cursor-pointer text-xs sm:text-base" onClick={toggleDropdown} >
+                            Hi, {user.firstname}
                         </span>
                         <button className="px-2 transition " onClick={toggleDropdown}> {/*Click to open dropdown*/}
                             {dropdownOpen ? (
                                 <>
                                     <i className="fas fa-angle-up"></i>
-                                    <div className="w-44 absolute top-10 right-0 mt-3 z-10 border rounded-lg">
-                                        <div className="flex flex-col w-full px-5 py-1 bg-[#F8F7F4]">
+                                    <div className="w-[106px] sm:w-[126px] absolute top-10 right-0 mt-3 z-10 border rounded-lg">
+                                        <div className="flex flex-col text-xs sm:text-base w-full px-5 py-1 bg-[#F8F7F4] border rounded-lg">
                                             <Link to="/userprofile" className="">User Profile</Link>
                                             <Link className="px-4" onClick={handleLogout}>Logout</Link>
                                         </div>
