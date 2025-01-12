@@ -7,7 +7,6 @@ import TypingIndicator from '../components/UI/Typing';
 const Chatbot = () => {
     const [messages, setMessages] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
-    const BASE_URL = process.env.REACT_APP_BACKEND_URL;
     const [user] = usePersistedUserState("userInfo", null);
     const token = user?.accessToken;
 
@@ -47,7 +46,7 @@ const Chatbot = () => {
 
     const fetchChatResponse = async (question) => {
         try {
-            const response = await fetch(`${BASE_URL}/ask`, {
+            const response = await fetch('https://chatbot-backend-production-12.up.railway.app/ask', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
