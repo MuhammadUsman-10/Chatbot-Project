@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import usePersistedUserState from '../components/UI/persistedHook';
-import {process} from 'react-native-dotenv'
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
