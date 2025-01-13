@@ -81,7 +81,7 @@ const Register = () => {
                             </div>
                         <div className="relative">
                             <button className="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-indigo-500
-                            rounded-lg transition duration-200 hover:bg-indigo-600 ease" onClick={onSubmit}>Submit</button>
+                            rounded-lg transition duration-200 hover:bg-indigo-600 ease" onClick={onSubmit}>Sign Up</button>
                         </div>
                         <div className="relative">
                             <Link className="w-full inline-block text-lg" to='/login'
