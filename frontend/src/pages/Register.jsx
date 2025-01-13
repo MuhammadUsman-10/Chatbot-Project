@@ -31,7 +31,7 @@ const Register = () => {
     };
     
     return (
-        <div className="bg-white relative lg:py-1">
+        <div className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 relative lg:py-1">
             <div className="flex flex-col items-center justify-between pt-0 pr-10 pb-0 pl-10 mt-0 mr-auto mb-0 ml-auto max-w-7xl
                 xl:px-5 lg:flex-row">
                 <div className="flex flex-col items-center w-full pt-5 pr-10 pb-20 pl-10 lg:pt-20 lg:flex-row">
