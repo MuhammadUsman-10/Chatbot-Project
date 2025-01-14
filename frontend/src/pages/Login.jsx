@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import usePersistedUserState from '../components/UI/persistedHook';
-
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [user] = usePersistedUserState("userInfo", null);
-    const token = user?.accessToken;
     const navigate = useNavigate();
 
     const onSubmit = async (e) => {
@@ -17,12 +13,7 @@ const Login = () => {
             {email,password},
         ).then((response) => {
             console.log(response);
-            const userInfo = {
-                ...response.data,
-                expiresAt: new Date().getTime() + response.data.expires_in * 1000};
-            localStorage.setItem('userInfo', JSON.stringify(userInfo))
-            // Set a timer to auto logout or refresh token
-            setAutoLogoutTimer(userInfo.expiresAt);
+            localStorage.setItem('userInfo', JSON.stringify(response.data));
             if (response.status === 200) {
                 navigate('/chatbot');
                 alert('Login successful');
@@ -38,82 +29,6 @@ const Login = () => {
                 alert('Error occurred. Please try again later');
             }
         });    
-    };
-
-    const refreshToken = async () => {
-        try {
-            const response = await axios.post('https://chatbot-backend-production-12.up.railway.app/refresh-token', {token});
-            const userInfo = {
-                ...response.data,
-                expiresAt: new Date().getTime() + response.data.expires_in * 1000,
-            };
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-            setAutoLogoutTimer(userInfo.expiresAt); // Reset the timer
-        } catch (error) {
-            console.log(error);
-            handleLogout(); // Logout if token refresh fails
-        }
-    };
-
-    useEffect(() => {
-        if (user && user.expiresAt) {
-            const currentTime = new Date().getTime();
-            if (currentTime > user.expiresAt) {
-                handleLogout(); // Logout if token is expired
-            } else {
-                setAutoLogoutTimer(user.expiresAt); // Set timer for auto logout
-            }
-        }
-    }, []);
-
-    const setAutoLogoutTimer = (expiresAt) => {
-        const currentTime = new Date().getTime();
-        const timeLeft = expiresAt - currentTime;
-    
-        if (timeLeft > 0) {
-            // Refresh token 5 minutes before expiry
-            const refreshTime = timeLeft - 5 * 60 * 1000; // 5 minutes before expiry
-            if (refreshTime > 0) {
-                setTimeout(() => {
-                    refreshToken(); // Call refresh token function
-                }, refreshTime);
-            }
-    
-            // Auto logout when token expires
-            setTimeout(() => {
-                handleLogout();
-            }, timeLeft);
-        }
-    };
-
-    useEffect(() => {
-        const handleUserActivity = () => {
-            if (user && user.expiresAt) {
-                const currentTime = new Date().getTime();
-                const timeLeft = user.expiresAt - currentTime;
-    
-                // Refresh token if less than 5 minutes are left
-                if (timeLeft > 0 && timeLeft < 5 * 60 * 1000) {
-                    refreshToken();
-                }
-            }
-        };
-    
-        // Add event listeners for user activity
-        window.addEventListener('mousemove', handleUserActivity);
-        window.addEventListener('keypress', handleUserActivity);
-    
-        // Cleanup event listeners
-        return () => {
-            window.removeEventListener('mousemove', handleUserActivity);
-            window.removeEventListener('keypress', handleUserActivity);
-        };
-    }, []);
-
-    const handleLogout = () => {
-        localStorage.removeItem("userInfo");
-        navigate('/login');
-        window.location.reload();
     };
     
     return (

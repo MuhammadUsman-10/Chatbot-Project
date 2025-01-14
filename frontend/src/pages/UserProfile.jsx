@@ -1,5 +1,4 @@
 import usePersistedUserState from "../components/UI/persistedHook";
-// import { useNavigate } from "react-router-dom";
 const UserProfile = () => {
     const [user] = usePersistedUserState("userInfo", null);
     return (
@@ -18,7 +17,7 @@ const UserProfile = () => {
                     <div className="mt-6">
                         <h3 className="text-lg font-medium text-gray-800">About</h3>
                         <p className="text-gray-600 mt-2">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.
+                            {user.about}
                         </p>
                     </div>
                     <div className="mt-6">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import ChatInput from '../components/UI/ChatInput';
 import ChatWindow from '../components/UI/ChatWindow';
 import usePersistedUserState from '../components/UI/persistedHook';
@@ -9,6 +9,13 @@ const Chatbot = () => {
     const [isTyping, setIsTyping] = useState(false);
     const [user] = usePersistedUserState("userInfo", null);
     const token = user?.accessToken;
+    const chatWindowRef = useRef(null);
+
+    useEffect(() => {
+        if (chatWindowRef.current) {
+            chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     useEffect(() => {
         if (messages.length === 0) {
@@ -38,7 +45,6 @@ const Chatbot = () => {
     const handleSend = async (question) => {
         const userMessage = { sender: 'user', text: question };
         setMessages((prev) => [...prev, userMessage]);
-
         setIsTyping(true);
         await fetchChatResponse(question); // API call
         setIsTyping(false);
@@ -57,18 +63,14 @@ const Chatbot = () => {
             if (!response.body) {
                 throw new Error("No response body received");
             }
-        
             const reader = response.body.getReader();
             const decoder = new TextDecoder("utf-8");
             let botMessage = "";
             let isBotMessageAdded = false;
-
             while (true) {
                 const { value, done } = await reader.read();
                 if (done) break;
-
                 botMessage += decoder.decode(value, { stream: true });
-
                 // Check if the bot message is not already added
                 if (!isBotMessageAdded) {
                     setMessages((prev) => [...prev, { sender: "bot", text: botMessage }]);
@@ -93,9 +95,8 @@ const Chatbot = () => {
         <div className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100">
             <div className='flex'>
                 <div className="container mx-auto flex flex-col h-[81vh]">
-                    <div className="flex-1 overflow-y-auto p-4">
+                    <div className="flex-1 overflow-y-auto p-4" ref={chatWindowRef}>
                         <ChatWindow messages={messages} />
-                        {/* {isTyping && <div className="text-gray-500 italic">Bot is typing...</div>} */}
                         {isTyping && <TypingIndicator />}
                     </div>
                     <div className="p-4 bg-gray-200 shadow-md rounded-2xl">
