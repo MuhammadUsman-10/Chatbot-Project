@@ -36,6 +36,7 @@ class User(BaseModel):
     firstname: str
     lastname: str
     email: str
+    about: str
     password: str
 
 class Login(BaseModel):
@@ -141,7 +142,7 @@ async def sign_up(user: User):
     hashed_password = generate_password_hash(user.password)
     if get_user(user.email):
         raise HTTPException(status_code=400, detail="User already exists.")
-    users_collection.insert_one({"firstname": user.firstname, "lastname": user.lastname, "email": user.email, "password": hashed_password})
+    users_collection.insert_one({"firstname": user.firstname, "lastname": user.lastname, "email": user.email, "about": user.about, "password": hashed_password})
     return {"message": "Sign-up successful. Please sign in."}
 
 # Login Route (Generate token)
@@ -160,6 +161,7 @@ async def login_for_access_token(user: Login):
             "firstname": db_user["firstname"],
             "lastname": db_user["lastname"],
             "email": db_user["email"],
+            "about": db_user["about"],
             "expires_in": access_token_expires.total_seconds()  # Expiry time in seconds
         }
 
