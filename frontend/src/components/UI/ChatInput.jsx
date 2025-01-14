@@ -1,9 +1,29 @@
-import { useState } from "react";
+import { useEffect, useRef, useState,  } from "react";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+import EmojiPicker from "emoji-picker-react";
 
 const ChatInput = ({ onSend }) => {
     const [inputValue, setInputValue] = useState('');
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const emojiPickerRef = useRef(null);
     const [isListening, setIsListening] = useState(false);
+
+    useEffect(() => {
+        // Function to handle outside click
+        const handleOutsideClick = (event) => {
+            if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+                setShowEmojiPicker(false); // Close emoji picker
+            }
+        };
+
+        // Add event listener for clicks
+        document.addEventListener("click", handleOutsideClick);
+
+        // Cleanup event listener
+        return () => {
+            document.removeEventListener("click", handleOutsideClick);
+        };
+    }, []);
 
     const { transcript, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
@@ -41,6 +61,11 @@ const ChatInput = ({ onSend }) => {
         }
     };
 
+    const handleEmojiClick = (emojiObject) => {
+        setInputValue((prevInput) => prevInput + emojiObject.emoji); // Append emoji to input value
+        setShowEmojiPicker(false); // Close emoji picker
+    };
+
     return (
         <div className="flex items-center space-x-2">
         <textarea
@@ -52,6 +77,16 @@ const ChatInput = ({ onSend }) => {
             onKeyDown={handleKeyDown}
             style={{ resize: "none", height: "50px", lineHeight: "30px" }}
         />
+        <div className="relative" ref={emojiPickerRef}>
+            <button onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-2 text-white rounded-lg">
+                😊
+            </button>
+            {showEmojiPicker && (
+                <div className="absolute top-[-460px] mb-2 right-0 bg-white shadow-lg rounded-lg">
+                    <EmojiPicker onEmojiClick={handleEmojiClick} theme="light" />
+                </div>
+            )}
+        </div>
         {isListening ? (
             <button onClick={stoplistening}>
                 <i className="fas fa-stop p-2 bg-gray-300 text-gray-700 rounded-lg" />

@@ -19,8 +19,8 @@ const Chatbot = () => {
 
     useEffect(() => {
         if (messages.length === 0) {
-            setMessages([{ text: "Hi! How are you?", fromUser: false },
-                { text: "How's you feeling today? Share your thoughts or emotions!", fromUser: false },
+            setMessages([{ text: "Hi! How are you? 👋🏼", fromUser: false },
+                { text: "How's you feeling today? Share your thoughts or emotions! 😊", fromUser: false },
             ]);
         }
     }, [messages]);
