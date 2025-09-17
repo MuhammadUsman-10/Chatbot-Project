@@ -9,7 +9,7 @@ const Login = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('https://chatbot-backend-production-12.up.railway.app/login',
+        await axios.post(`import.meta.env.VITE_BACKEND_URL/login`,
             {email,password},
         ).then((response) => {
             console.log(response);
