@@ -53,7 +53,7 @@ const Chatbot = () => {
 
     const fetchChatResponse = async (question) => {
         try {
-            const response = await fetch(`BACKEND_URL/ask`, {
+            const response = await fetch(`${BACKEND_URL}/ask`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
