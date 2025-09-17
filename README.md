@@ -15,7 +15,7 @@ This Chatbot is developed to assist people to feel good while sharing their feel
 2. **MongoDB Atlas for Database**
 3. **Python**
 4. **OpenAI Model**
-5. **langchain chain for LLM chaining and chatHistory for memory context**, and **chromaDB for embeddings**.
+5. **langchain for LLM chaining and chatHistory for memory context**, and **chromaDB for embeddings**.
 - The Model is being fine-tuned on the provided JSON data and generates response based on the similarity search between stored emeddings and the user input.
 ### 2. Deployment
 - The frontend is being deployed on [Vercel](https://vercel.com) using default build production.
@@ -46,3 +46,4 @@ This Chatbot is developed to assist people to feel good while sharing their feel
 #### If found some issues in current release, please raise in issue and create a PR for it.
 
 ### Thank You Everyone! - enjoy 😁
+
