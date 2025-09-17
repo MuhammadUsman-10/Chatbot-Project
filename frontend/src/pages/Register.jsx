@@ -10,10 +10,11 @@ const Register = () => {
     const [about, setAbout] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post(`import.meta.env.VITE_BACKEND_URL/signup`,
+        await axios.post(`BACKEND_URL/signup`,
             {firstname, lastname, email, about, password},
         ).then((response) => {
             console.log(response);
