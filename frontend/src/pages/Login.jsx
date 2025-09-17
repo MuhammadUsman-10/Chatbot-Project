@@ -10,7 +10,7 @@ const Login = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post(`BACKEND_URL/login`,
+        await axios.post(`${BACKEND_URL}/login`,
             {email,password},
         ).then((response) => {
             console.log(response);
