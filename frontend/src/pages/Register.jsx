@@ -13,7 +13,7 @@ const Register = () => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('https://chatbot-backend-production-12.up.railway.app/signup',
+        await axios.post(`import.meta.env.VITE_BACKEND_URL/signup`,
             {firstname, lastname, email, about, password},
         ).then((response) => {
             console.log(response);
