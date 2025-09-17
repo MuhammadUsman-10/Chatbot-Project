@@ -10,6 +10,7 @@ const Chatbot = () => {
     const [user] = usePersistedUserState("userInfo", null);
     const token = user?.accessToken;
     const chatWindowRef = useRef(null);
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
     useEffect(() => {
         if (chatWindowRef.current) {
@@ -52,7 +53,7 @@ const Chatbot = () => {
 
     const fetchChatResponse = async (question) => {
         try {
-            const response = await fetch(`import.meta.env.VITE_BACKEND_URL/ask`, {
+            const response = await fetch(`BACKEND_URL/ask`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
