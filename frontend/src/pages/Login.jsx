@@ -6,10 +6,11 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post(`import.meta.env.VITE_BACKEND_URL/login`,
+        await axios.post(`BACKEND_URL/login`,
             {email,password},
         ).then((response) => {
             console.log(response);
