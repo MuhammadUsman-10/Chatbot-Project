@@ -52,7 +52,7 @@ const Chatbot = () => {
 
     const fetchChatResponse = async (question) => {
         try {
-            const response = await fetch('https://chatbot-backend-production-12.up.railway.app/ask', {
+            const response = await fetch(`import.meta.env.VITE_BACKEND_URL/ask`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
